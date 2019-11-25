@@ -5,7 +5,7 @@ import heapq
 from TSPClasses import *
 import numpy as np
 import time
-from branch_bound import BranchAndBoundSolver
+from branch_bound.solver import BranchAndBoundSolver
 
 from which_pyqt import PYQT_VER
 if PYQT_VER == 'PYQT5':

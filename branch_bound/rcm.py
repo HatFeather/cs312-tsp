@@ -1,15 +1,11 @@
 import numpy
 import math
-import utils
+import branch_bound.utils as utils
+
 
 class RCM:
 
-    def init_as_copy(self, rcm_to_copy):
-        self.cost = rcm_to_copy.cost
-        self.length = rcm_to_copy.length
-        self.values = numpy.copy(rcm_to_copy.values)
-
-    def init_as_original(self, scenario):
+    def __init__(self, scenario):
         cities = scenario.getCities()
         city_len = len(cities)
 
@@ -18,19 +14,7 @@ class RCM:
         self.values = numpy.empty((self.length, self.length))
         for row in range(self.length):
             for col in range(self.length):
-                edge_exists = scenario._edge_exists[row, col]
-                if edge_exists:
-                    sqr_dist = utils.compute_sqr_dist(cities[row], cities[col])
-                    self.values[row, col] = sqr_dist
-                else:
-                    self.values[row, col] = math.inf
-
-        self.length = 4
-        self.values = numpy.array([
-            [math.inf, 7, 3, 12],
-            [3, math.inf, 6, 14],
-            [5, 8, math.inf, 6],
-            [9, 3, 5, math.inf]])
+                self.values[row, col] = cities[row].costTo(cities[col])
 
     def get_cost(self):
         return self.cost
@@ -56,7 +40,7 @@ class RCM:
                     min_val = self.values[row, col]
             if min_val == math.inf:
                 continue
-            
+
             self.cost += min_val
             for col in range(self.length):
                 self.values[row, col] -= min_val
