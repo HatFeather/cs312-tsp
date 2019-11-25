@@ -5,7 +5,9 @@ import heapq
 from TSPClasses import *
 import numpy as np
 import time
+
 from branch_bound.solver import BranchAndBoundSolver
+from greedy.solver import GreedySolver
 
 from which_pyqt import PYQT_VER
 if PYQT_VER == 'PYQT5':
@@ -77,7 +79,9 @@ class TSPSolver:
 	'''
 
     def greedy(self, time_allowance=60.0):
-        pass
+        solver = GreedySolver(self)
+        solver.solve()
+        return
 
     ''' <summary>
 		This is the entry point for the branch-and-bound algorithm that you will implement
@@ -89,9 +93,9 @@ class TSPSolver:
 	'''
 
     def branchAndBound(self, time_allowance=60.0):
-        solver = BranchAndBoundSolver()
-        solver.solve(self)
-        return solver.results
+        solver = BranchAndBoundSolver(self, 10) # TODO max_nodes ??
+        solver.solve()
+        return solver.get_results()
 
     ''' <summary>
 		This is the entry point for the algorithm you'll write for your group project.
