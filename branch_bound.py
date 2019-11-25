@@ -8,10 +8,3 @@ class BranchAndBoundSolver:
         self.solver = solver
         self.scenario = solver._scenario
 
-        rcm = RCM()
-        rcm.init_as_original(self.scenario)
-        rcm.print("initialized")
-
-        rcm.do_reduction()
-        rcm.print("reduced")
-
