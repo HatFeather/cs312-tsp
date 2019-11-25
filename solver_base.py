@@ -32,9 +32,6 @@ class SolverBase:
     def get_city_at(self, index) -> City:
         return self.get_cities()[index]
 
-    def get_start_city(self) -> City:
-        return self.get_cities()[0]
-    
     def get_city_range(self):
         return range(self.get_city_count())
 
