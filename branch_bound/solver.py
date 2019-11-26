@@ -14,8 +14,9 @@ class BranchAndBoundSolver(SolverBase):
         self.node_queue = PriorityQueue(max_nodes)
 
     def run_algorithm(self):
-        
+
         greedy = GreedySolver(self.get_tsp_solver())
         greedy.solve()
+        super().set_bssf(greedy.get_bssf())
 
         pass

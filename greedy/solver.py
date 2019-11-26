@@ -22,8 +22,8 @@ class GreedySolver(SolverBase):
             sol = self._greedy_solve(original, current, visited, route)
             if sol == None:
                 continue
-            
-            super().set_bssf(sol)
+
+            super().set_bssf_from_route(sol)
             return
 
     def _greedy_solve(self, original, current, visited, route):

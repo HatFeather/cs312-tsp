@@ -18,10 +18,10 @@ class SolverBase:
         self._cities = self.get_scenario().getCities()
         self._city_count = len(self._cities)
 
-        self.bssf = None
-        self.max = None
-        self.total = None
-        self.pruned = None
+        self.set_bssf(None)
+        self.set_max(None)
+        self.set_total(None)
+        self.set_pruned(None)
 
     def get_results(self):
         return self._results
@@ -44,8 +44,35 @@ class SolverBase:
     def get_city_range(self):
         return range(self.get_city_count())
 
-    def set_bssf(self, route):
-        self.bssf = TSPSolution(route)
+    def set_bssf_from_route(self, route):
+        self.set_bssf(TSPSolution(route))
+
+    def get_bssf(self):
+        return self._bssf
+
+    def set_bssf(self, value):
+        self._bssf = value
+
+    def get_max(self):
+        return self._max
+
+    def set_max(self, value):
+        self._max = value
+
+    def get_total(self):
+        return self._total
+
+    def set_total(self, value):
+        self._total = value
+
+    def get_pruned(self):
+        return self._pruned
+
+    def set_pruned(self, value):
+        self._pruned = value
+
+    def increment_pruned(self):
+        self.set_pruned(self.get_pruned() + 1)
 
     def solve(self):
 
@@ -53,13 +80,14 @@ class SolverBase:
         self.run_algorithm()
         end_time = time.time()
 
-        self._results['cost'] = self.bssf.cost if self.bssf != None else math.inf
+        bssf = self.get_bssf()
+        self._results['cost'] = bssf.cost if bssf != None else math.inf
         self._results['time'] = end_time - start_time
         self._results['count'] = 0  # TODO ??
-        self._results['soln'] = self.bssf
-        self._results['max'] = self.max
-        self._results['total'] = self.total
-        self._results['pruned'] = self.pruned
+        self._results['soln'] = self.get_bssf()
+        self._results['max'] = self.get_max()
+        self._results['total'] = self.get_total()
+        self._results['pruned'] = self.get_pruned()
 
     @abstractmethod
     def run_algorithm(self):
