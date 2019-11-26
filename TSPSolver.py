@@ -81,7 +81,7 @@ class TSPSolver:
     def greedy(self, time_allowance=60.0):
         solver = GreedySolver(self)
         solver.solve()
-        return
+        return solver.get_results()
 
     ''' <summary>
 		This is the entry point for the branch-and-bound algorithm that you will implement

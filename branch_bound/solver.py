@@ -13,7 +13,7 @@ class BranchAndBoundSolver(SolverBase):
         super().__init__(tsp_solver)
         self.node_queue = PriorityQueue(max_nodes)
 
-    def solve(self):
+    def run_algorithm(self):
         
         greedy = GreedySolver(self.get_tsp_solver())
         greedy.solve()
