@@ -28,8 +28,8 @@ class RCM:
     def get_col_count(self) -> int:
         return self._length
 
-    def get_values(self) -> List[City]:
-        return self._values
+    def get_value_at(self, row, col) -> float:
+        return self._values[row, col]
 
     def do_selection(self, row_index, col_index):
         self._cost += self._values[row_index, col_index]

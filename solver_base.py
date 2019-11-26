@@ -9,7 +9,7 @@ import math
 
 class SolverBase:
 
-    def __init__(self, tsp_solver):
+    def __init__(self, tsp_solver, max_time):
         super().__init__()
 
         self._results = {}
@@ -17,11 +17,18 @@ class SolverBase:
         self._scenario = tsp_solver._scenario
         self._cities = self.get_scenario().getCities()
         self._city_count = len(self._cities)
+        self._max_time = max_time
+        self._start_time = None
+        self._end_time = None
+        self._intermediate_cnt = 0
+        self._total = 0
+        self._pruned = 0
 
         self.set_bssf(None)
         self.set_max(None)
-        self.set_total(None)
-        self.set_pruned(None)
+
+    def get_max_time(self):
+        return self._max_time
 
     def get_results(self):
         return self._results
@@ -47,7 +54,7 @@ class SolverBase:
     def set_bssf_from_route(self, route):
         self.set_bssf(TSPSolution(route))
 
-    def get_bssf(self):
+    def get_bssf(self) -> TSPSolution:
         return self._bssf
 
     def set_bssf(self, value):
@@ -59,35 +66,36 @@ class SolverBase:
     def set_max(self, value):
         self._max = value
 
-    def get_total(self):
-        return self._total
+    def increment_total(self, amount=1):
+        self._total += amount
 
-    def set_total(self, value):
-        self._total = value
+    def increment_pruned(self, amount=1):
+        self._pruned += amount
 
-    def get_pruned(self):
-        return self._pruned
+    def increment_solution_try_count(self, amount=1):
+        self._intermediate_cnt += amount
 
-    def set_pruned(self, value):
-        self._pruned = value
+    def get_total_time(self):
+        return time.time() - self._start_time
 
-    def increment_pruned(self):
-        self.set_pruned(self.get_pruned() + 1)
+    def exceeded_max_time(self):
+        return self.get_total_time() > self.get_max_time()
 
     def solve(self):
 
-        start_time = time.time()
+        self._start_time = time.time()
         self.run_algorithm()
-        end_time = time.time()
 
         bssf = self.get_bssf()
+        clamped_time = self.get_max_time() if self.exceeded_max_time() else self.get_total_time()
+
         self._results['cost'] = bssf.cost if bssf != None else math.inf
-        self._results['time'] = end_time - start_time
-        self._results['count'] = 0  # TODO ??
+        self._results['time'] = clamped_time
+        self._results['count'] = self._intermediate_cnt
         self._results['soln'] = self.get_bssf()
         self._results['max'] = self.get_max()
-        self._results['total'] = self.get_total()
-        self._results['pruned'] = self.get_pruned()
+        self._results['total'] = self._total
+        self._results['pruned'] = self._pruned
 
     @abstractmethod
     def run_algorithm(self):

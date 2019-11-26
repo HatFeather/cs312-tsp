@@ -79,7 +79,7 @@ class TSPSolver:
 	'''
 
     def greedy(self, time_allowance=60.0):
-        solver = GreedySolver(self)
+        solver = GreedySolver(self, time_allowance)
         solver.solve()
         return solver.get_results()
 
@@ -93,7 +93,8 @@ class TSPSolver:
 	'''
 
     def branchAndBound(self, time_allowance=60.0):
-        solver = BranchAndBoundSolver(self, 10) # TODO max_nodes ??
+        # TODO max nodes?
+        solver = BranchAndBoundSolver(self, 100000, time_allowance)
         solver.solve()
         return solver.get_results()
 
