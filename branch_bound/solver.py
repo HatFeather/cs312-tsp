@@ -29,16 +29,16 @@ class BranchAndBoundSolver(SolverBase):
         start_rcm.do_reduction()
 
         root = BranchNode(start_rcm, start_city, start_index, None)
-        self._node_queue.put((root.get_cost(), root))
+        self._node_queue.put((self._get_node_key(root), root))
         self.increment_total()
 
         while not self._node_queue.empty() and not self.exceeded_max_time():
 
-            print('time: {}'.format(self.get_total_time()))
             current = self._node_queue.get()[1]
 
             # prune pointless paths as we go
-            if current.get_cost() >= self.get_bssf().cost:
+            best_cost = math.inf if self.get_bssf() == None else self.get_bssf().cost
+            if current.get_cost() >= best_cost:
                 self.increment_pruned()
                 continue
 
@@ -48,23 +48,26 @@ class BranchAndBoundSolver(SolverBase):
                 loop_cost = current.get_city().costTo(start_city)
                 if loop_cost == math.inf:
                     continue
-                elif loop_cost < self.get_bssf().cost:
+                elif loop_cost < best_cost:
                     route = current.get_path()
                     self.set_bssf_from_route(route)
+                    print('sol (t: {0:.3f})'.format(self.get_clamped_time()))
 
             # continue branching
             current.generate_child_nodes(self.get_cities())
             self.increment_total(current.get_child_count())
             for child in current.get_children():
                 if not self._node_queue.full():
-                    cost = child.get_cost()
-                    self._node_queue.put((cost, child))
+                    self._node_queue.put((self._get_node_key(child), child))
                 else:
                     self.increment_pruned()
                     break
-        
-        print('finished')
+
+        print('fin (t: {0:.3f})'.format(self.get_clamped_time()))
         self.increment_pruned(self._node_queue.qsize())
+
+    def _get_node_key(self, bnode):
+        return bnode.get_cost() / bnode.get_depth()
 
     def _do_greedy(self):
         greedy = GreedySolver(self.get_tsp_solver(), self.get_max_time())

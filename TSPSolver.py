@@ -93,8 +93,8 @@ class TSPSolver:
 	'''
 
     def branchAndBound(self, time_allowance=60.0):
-        # TODO max nodes?
-        solver = BranchAndBoundSolver(self, 100000, time_allowance)
+        MAX_NODES = 100000
+        solver = BranchAndBoundSolver(self, MAX_NODES, time_allowance)
         solver.solve()
         return solver.get_results()
 

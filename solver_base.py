@@ -6,12 +6,15 @@ from abc import abstractmethod
 import time
 import math
 
-
+# a base class for all TSP solvers that helps abstract the logic
+# for creating, returning, and updating solutions
 class SolverBase:
 
     def __init__(self, tsp_solver, max_time):
         super().__init__()
 
+        # cache values that are used throughout
+        # the different solvers
         self._results = {}
         self._tsp_solver = tsp_solver
         self._scenario = tsp_solver._scenario
@@ -26,6 +29,11 @@ class SolverBase:
 
         self.set_bssf(None)
         self.set_max(None)
+
+    ####### REGION: HELPER METHODS #######
+    # all methods in this region are assumed to have constant time and space 
+    # complexity and will not be counted toward the total complexity of the 
+    # algorithms (these methods just make the code more readable)
 
     def get_max_time(self):
         return self._max_time
@@ -78,25 +86,34 @@ class SolverBase:
     def get_total_time(self):
         return time.time() - self._start_time
 
+    def get_clamped_time(self):
+        return min(self.get_max_time(), self.get_total_time())
+
     def exceeded_max_time(self):
         return self.get_total_time() > self.get_max_time()
 
+    ####### END REGION: HELPER METHODS #######
+
+    # runs and solves the TSP using some algorithm (based on whichever solver 
+    # implements this class); thus, the time and space complexity will vary
     def solve(self):
 
+        # time and run the algorithm
         self._start_time = time.time()
         self.run_algorithm()
 
+        # update the results dictionary
         bssf = self.get_bssf()
-        clamped_time = self.get_max_time() if self.exceeded_max_time() else self.get_total_time()
-
         self._results['cost'] = bssf.cost if bssf != None else math.inf
-        self._results['time'] = clamped_time
+        self._results['time'] = self.get_clamped_time()
         self._results['count'] = self._intermediate_cnt
-        self._results['soln'] = self.get_bssf()
+        self._results['soln'] = bssf
         self._results['max'] = self.get_max()
         self._results['total'] = self._total
         self._results['pruned'] = self._pruned
 
+    # child classes will implement this method based on different ways of 
+    # solving the TSP (time and space complexity will vary)
     @abstractmethod
     def run_algorithm(self):
         pass
