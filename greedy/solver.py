@@ -3,16 +3,24 @@ from copy import copy
 from random import randrange
 import math
 
+
 # NOTE: for all code below, let |V| be the number of cities
 class GreedySolver(SolverBase):
 
     def __init__(self, tsp_solver, max_time):
+        '''
+        initialize this solver using all the defaults provided in solver base
+        \ntime:     constant
+        \nspace:    constant
+        '''
         super().__init__(tsp_solver, max_time)
 
-    # a recursive definition to greedily attempt to find optimal routes
-    # time:     O(|V|) loop, with O(|V|^2) at each loop --> O(|V|^3)
-    # space:    for the visted set and route array --> O(|V|)
     def run_algorithm(self):
+        '''
+        repeatedly tries to greedily solve the TSP by calling 'self._greedy_solve'
+        \ntime:     O(|V|) loop, with O(|V|^2) at each loop --> O(|V|^3)
+        \nspace:    for the visted set and route array --> O(|V|)
+        '''
 
         # pick a random city to start at
         start_index = randrange(self.get_city_count())
@@ -31,18 +39,20 @@ class GreedySolver(SolverBase):
 
             # O(|V|^2) cost to solve greedily starting at the original node
             sol = self._greedy_solve(original, current, visited, route)
-            self.increment_solution_try_count()
             if sol == None:
                 continue
 
             # a greedy solution was found, update bssf
             self.set_bssf_from_route(sol)
+            self.increment_solution_count()
             return
 
-    # a recursive definition to greedily attempt to find optimal routes
-    # time:     recurses at most O(|V|) times, each costing O(|V|) --> O(|V|^2)
-    # space:    visted set and route array take up at most O(2|V|) --> O(|V|)
     def _greedy_solve(self, original, current, visited, route):
+        '''
+        a recursive definition to greedily attempt to find optimal routes
+        \ntime:     recurses at most O(|V|) times, each costing O(|V|) --> O(|V|^2)
+        \nspace:    visted set and route array take up at most O(2|V|) --> O(|V|)
+        '''
 
         # base case: if all cities have been visited, try and close this route: O(1) time
         # (fails if there is no route back to the original city)
@@ -62,10 +72,13 @@ class GreedySolver(SolverBase):
             route.append(self.get_city_at(target))  # assumed constant time, at most O(|V|) space
             return self._greedy_solve(original, target, visited, route)
 
-    # gets the least expensive, unvisted neighboring city to the source node
-    # time:     loops through all neighboring cities --> O(|V|)
-    # space:    no significant allocations --> O(1)
     def _get_next_city(self, source, visited):
+        '''
+        gets the least expensive, unvisted neighboring city to the source node
+        \ntime:     loops through all neighboring cities --> O(|V|)
+        \nspace:    no significant allocations --> O(1)
+        '''
+
         min_cost = math.inf
         min_index = None
 

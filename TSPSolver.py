@@ -79,6 +79,9 @@ class TSPSolver:
 	'''
 
     def greedy(self, time_allowance=60.0):
+        # see the GreedySolver class
+        # time:     O(|V|^3)
+        # space:    O(|V|)
         solver = GreedySolver(self, time_allowance)
         solver.solve()
         return solver.get_results()
@@ -93,6 +96,9 @@ class TSPSolver:
 	'''
 
     def branchAndBound(self, time_allowance=60.0):
+        # see the BranchAndBoundSolver class
+        # time:     O(2^|V| * |V|^3 * log(MAX_NODES))
+        # space:    O(MAX_NODES * |V|^2)
         MAX_NODES = 100000
         solver = BranchAndBoundSolver(self, MAX_NODES, time_allowance)
         solver.solve()
