@@ -58,9 +58,11 @@ class BranchAndBoundSolver(SolverBase):
         start_rcm.do_reduction()
 
         # construct the root branch node from the start city with its associated RCM
+        # (the first state created for this branch and bound problem)
         root = BranchNode(start_rcm, start_city, start_index, None)
-        self._node_queue.put((self._get_node_key(root), root)) # only node, will cost O(1)
-        self.increment_total() # increment total number of states created
+        self.increment_total()
+        if root.get_cost() < self.get_best_cost():
+            self._node_queue.put((self._get_node_key(root), root)) 
 
         # loop while there are still paths to process and theres still time
         while not self._node_queue.empty() and not self.exceeded_max_time():
@@ -69,8 +71,7 @@ class BranchAndBoundSolver(SolverBase):
             current = self._node_queue.get()[1]
 
             # prune paths that exceed the bssf as we go
-            best_cost = math.inf if self.get_bssf() == None else self.get_bssf().cost
-            if current.get_cost() >= best_cost:
+            if current.get_cost() >= self.get_best_cost():
                 self.increment_pruned()
                 continue
 
@@ -80,7 +81,7 @@ class BranchAndBoundSolver(SolverBase):
 
                 # O(1) check to see if the this route fails
                 loop_cost = current.get_city().costTo(start_city)
-                if loop_cost == math.inf or loop_cost >= best_cost:
+                if loop_cost == math.inf or loop_cost >= self.get_best_cost():
                     continue
 
                 # the current route is more optimal, choose it
@@ -98,7 +99,7 @@ class BranchAndBoundSolver(SolverBase):
             # loop through all children nodes --> O(|V|)
             for child in current.get_children():
                 # try to push the child onto the queue --> O(log(MAX_NODES)) time
-                if not self._node_queue.full():
+                if not self._node_queue.full() and child.get_cost() < self.get_best_cost():
                     self._node_queue.put((self._get_node_key(child), child))
                 else:
                     self.increment_pruned()

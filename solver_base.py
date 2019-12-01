@@ -91,6 +91,9 @@ class SolverBase:
     def set_bssf_from_route(self, route):
         self.set_bssf(TSPSolution(route))
 
+    def get_best_cost(self) -> float:
+        return math.inf if self.get_bssf() == None else self.get_bssf().cost
+
     def get_bssf(self) -> TSPSolution:
         return self._bssf
 
