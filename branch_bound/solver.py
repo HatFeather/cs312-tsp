@@ -35,15 +35,14 @@ class BranchAndBoundSolver(SolverBase):
         routes as it goes, in an effort to find the most optimal solution
         \ntime:     consider to following:
                     1) the initial greedy solver takes O(|V|^3) time to compute;
-                    2) each branch node has (|V| - #-of-cities-already-traversed)
-                       sub-problems (branch nodes), each costing O(|V|^2) to produce;
+                    2) each branch node has (|V| - node.get_depth()) sub-problems 
+                       (branch nodes), each costing O(|V|^2) to produce;
                     3) each branch node requires and upper bound of O(log(queue_size) 
                        to be queued/dequeued; 
                     4) computing a path from a branch node only happens if children aren't
                        generated, thus this cost can be ignored;
-                    5) the tree generated is, worst case, n levels deep and each node braches
-                       into |V| - depth other nodes
-                    `total complexity --> O(|V|! * |V|^2 * log(queue_size))` capped at max_time and 
+                    5) the tree generated is, worst case, n levels deep;
+                    `total complexity --> O(|V|! * |V|^2)` capped at max_time 
         \nspace:    with at most queue_size in the queue, each node takes O(|V|^2)
                     space --> O(queue_size * |V|^2)
         '''
