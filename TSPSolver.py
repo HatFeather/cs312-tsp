@@ -97,8 +97,8 @@ class TSPSolver:
 
     def branchAndBound(self, time_allowance=60.0):
         # see the BranchAndBoundSolver class
-        # time:     O(2^|V| * |V|^3 * log(MAX_NODES))
-        # space:    O(MAX_NODES * |V|^2)
+        # time:     O(|V|! * |V|^2 * log(queue_size))
+        # space:    O(queue_size * |V|^2)
         MAX_NODES = 100000
         solver = BranchAndBoundSolver(self, MAX_NODES, time_allowance)
         solver.solve()
