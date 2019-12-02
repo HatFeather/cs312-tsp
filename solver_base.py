@@ -11,10 +11,12 @@ import math
 # for creating, returning, and updating solutions
 class SolverBase:
 
-    # initialize references to helper variables
-    # time:     constant
-    # space:    constant
     def __init__(self, tsp_solver, max_time):
+        '''
+        initialize references to helper variables
+        \ntime:     constant
+        \nspace:    constant
+        '''
         super().__init__()
 
         # cache values that are used throughout
@@ -32,12 +34,13 @@ class SolverBase:
         self._pruned = 0
 
         self.set_bssf(None)
-        self.set_max(None)
+        self.set_max_concurrent_nodes(None)
 
-    # runs and solves the TSP using some algorithm (based on whichever solver 
-    # implements this class); thus, the time and space complexity will vary
     def solve(self):
-
+        '''
+        runs and solves the TSP using some algorithm (based on whichever solver 
+        implements this class); thus, the time and space complexity will vary
+        '''
         # time and run the algorithm
         self._start_time = time.time()
         self.run_algorithm()
@@ -48,14 +51,16 @@ class SolverBase:
         self._results['time'] = self.get_clamped_time()
         self._results['count'] = self._intermediate_cnt
         self._results['soln'] = bssf
-        self._results['max'] = self.get_max()
+        self._results['max'] = self.get_max_concurrent_nodes()
         self._results['total'] = self._total
         self._results['pruned'] = self._pruned
 
-    # child classes will implement this method based on different ways of 
-    # solving the TSP (time and space complexity will vary)
     @abstractmethod
     def run_algorithm(self):
+        '''
+        child classes will implement this method based on different ways of 
+        solving the TSP (time and space complexity will vary)
+        '''
         pass
 
     ####### REGION: HELPER METHODS #######
@@ -100,10 +105,10 @@ class SolverBase:
     def set_bssf(self, value):
         self._bssf = value
 
-    def get_max(self):
+    def get_max_concurrent_nodes(self):
         return self._max
 
-    def set_max(self, value):
+    def set_max_concurrent_nodes(self, value):
         self._max = value
 
     def increment_total(self, amount=1):
@@ -123,5 +128,9 @@ class SolverBase:
 
     def exceeded_max_time(self):
         return self.get_total_time() > self.get_max_time()
+
+    def try_update_max_concurrent_nodes(self, new_value):
+        updated_val = max(self.get_max_concurrent_nodes(), new_value)
+        self.set_max_concurrent_nodes(updated_val)
 
     ####### END REGION: HELPER METHODS #######

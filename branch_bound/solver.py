@@ -24,9 +24,10 @@ class BranchAndBoundSolver(SolverBase):
 
         # cap the number of nodes allowed in the priority queue to MAX_NODES
         # NOTE: the priority queue is implemented as a binary tree
-        # with O(log(MAX_NODES)) insertion and removal time
+        # with O(log(MAX_NODES)) as the upper bound insertion and removal time
         self._node_queue = PriorityQueue(max_nodes)
-        self.set_max(max_nodes)
+        self.set_max_concurrent_nodes(0)
+        self.try_update_max_concurrent_nodes(self._node_queue.qsize())
 
     def run_algorithm(self):
         '''
@@ -34,14 +35,17 @@ class BranchAndBoundSolver(SolverBase):
         routes as it goes, in an effort to find the most optimal solution
         \ntime:     consider to following:
                     1) the initial greedy solver takes O(|V|^3) time to compute;
-                    2) each branch node has O(|V|) sub-problems (branch nodes) which cost
-                       O(|V|^3) to produce;
-                    3) each branch node requires O(log(MAX_NODES) to be queued/dequeued; 
+                    2) each branch node has (|V| - #-of-cities-already-traversed)
+                       sub-problems (branch nodes), each costing O(|V|^2) to produce;
+                    3) each branch node requires and upper bound of O(log(queue_size) 
+                       to be queued/dequeued; 
                     4) computing a path from a branch node only happens if children aren't
                        generated, thus this cost can be ignored;
-                    `total complexity --> O(2^|V| * |V|^3 * log(MAX_NODES))` capped at max_time
-        \nspace:    with at most MAX_NODES in the queue, each node takes O(|V|^2)
-                    space --> O(MAX_NODES * |V|^2)
+                    5) the tree generated is, worst case, n levels deep and each node braches
+                       into |V| - depth other nodes
+                    `total complexity --> O(|V|! * |V|^2 * log(queue_size))` capped at max_time and 
+        \nspace:    with at most queue_size in the queue, each node takes O(|V|^2)
+                    space --> O(queue_size * |V|^2)
         '''
 
         # O(|V|^3) time and O(|V|) space call to greedily compute the initial bssf
@@ -62,12 +66,13 @@ class BranchAndBoundSolver(SolverBase):
         root = BranchNode(start_rcm, start_city, start_index, None)
         self.increment_total()
         if root.get_cost() < self.get_best_cost():
-            self._node_queue.put((self._get_node_key(root), root)) 
+            self._node_queue.put((self._get_node_key(root), root))
+            self.try_update_max_concurrent_nodes(self._node_queue.qsize())
 
         # loop while there are still paths to process and theres still time
         while not self._node_queue.empty() and not self.exceeded_max_time():
 
-            # binary heap removal: O(log(MAX_NODES)) to remove from the queue
+            # binary heap removal: upper bound O(log(MAX_NODES)) to remove from the queue
             current = self._node_queue.get()[1]
 
             # prune paths that exceed the bssf as we go
@@ -92,17 +97,21 @@ class BranchAndBoundSolver(SolverBase):
                 continue
 
             # continue branching: create nodes for the currently selected node (popped
-            # off of the priority queue) --> O(|V|^3) time and O(|V|^2) space (each node)
+            # off of the priority queue) --> O(|V|^2) time and space for each child generated 
             current.generate_child_nodes(self.get_cities())
             self.increment_total(current.get_child_count())
 
             # loop through all children nodes --> O(|V|)
             for child in current.get_children():
-                # try to push the child onto the queue --> O(log(MAX_NODES)) time
+                # try to push the child onto the queue --> upper bound O(log(MAX_NODES))
                 if not self._node_queue.full() and child.get_cost() < self.get_best_cost():
                     self._node_queue.put((self._get_node_key(child), child))
                 else:
                     self.increment_pruned()
+
+            # some nodes were inserted into the queue, try toupdate the max nodes
+            # stored at a given time --> O(1)
+            self.try_update_max_concurrent_nodes(self._node_queue.qsize())
 
         # count the remaining nodes as pruned
         self.increment_pruned(self._node_queue.qsize()) 
