@@ -8,6 +8,7 @@ import time
 
 from branch_bound.solver import BranchAndBoundSolver
 from greedy.solver import GreedySolver
+from kopt.solver import KOptSolver
 
 from which_pyqt import PYQT_VER
 if PYQT_VER == 'PYQT5':
@@ -114,4 +115,6 @@ class TSPSolver:
 	'''
 
     def fancy(self, time_allowance=60.0):
-        pass
+        solver = KOptSolver(self, time_allowance)
+        solver.solve()
+        return solver.get_results()
