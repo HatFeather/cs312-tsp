@@ -69,6 +69,9 @@ class SolverBase:
     # algorithms (these methods are self explanatory and just make the code 
     # more readable)
 
+    def get_bssf_route(self):
+        return None if self.get_bssf() == None else self.get_bssf().route
+
     def get_max_time(self):
         return self._max_time
 
