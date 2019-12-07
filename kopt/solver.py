@@ -18,7 +18,7 @@ class KOptSolver(SolverBase):
     def swap_cities(self, route, indices):
 
         indices_len = len(indices)
-        self.print_route(route)
+        self.print_route(route, label='before swap')
 
         for i in range(1, indices_len):
 
@@ -29,14 +29,9 @@ class KOptSolver(SolverBase):
             part_b = route[index_a:index_b][::-1]
             part_c = route[index_b:]
 
+            route = part_a + part_b + part_c
 
-            self.print_route(part_a, 'part a')
-            self.print_route(part_b, 'part b')
-            self.print_route(part_c, 'part c')
-
-            # route = part_a + part_b + part_c
-
-        self.print_route(route)
+        self.print_route(route, label='after swap')
         return route
 
     def get_route_cost(self, route):
