@@ -10,15 +10,15 @@ class KOptSolver(SolverBase):
     def run_algorithm(self):
 
         route = self.build_initial_route()
-        city_indices = [1, 2]
+        city_indices = [3, 6]
 
-        # route = self.swap_cities(route, city_indices)
-        self.print_route(route)
+        route = self.swap_cities(route, city_indices)
         self.set_bssf_from_route(route)
 
     def swap_cities(self, route, indices):
 
         indices_len = len(indices)
+        self.print_route(route)
 
         for i in range(1, indices_len):
 
@@ -26,11 +26,17 @@ class KOptSolver(SolverBase):
             index_b = indices[i]
 
             part_a = route[0:index_a]
-            part_b = route[index_a:index_b].reverse()
-            part_c = route[index_b:0]
+            part_b = route[index_a:index_b][::-1]
+            part_c = route[index_b:]
 
-            route = part_a + part_b + part_c
 
+            self.print_route(part_a, 'part a')
+            self.print_route(part_b, 'part b')
+            self.print_route(part_c, 'part c')
+
+            # route = part_a + part_b + part_c
+
+        self.print_route(route)
         return route
 
     def get_route_cost(self, route):
@@ -58,8 +64,11 @@ class KOptSolver(SolverBase):
 
         return route
 
-    def print_route(self, route):
-        print('path: ', end='')
-        for i in range(len(route)):
-            print('{}, '.format(route[i]._index), end='')
-        print('')
+    def print_route(self, route, label='path'):
+        print('{}: '.format(label), end='')
+        if route == None:
+            print('None')
+        else:
+            for i in range(len(route)):
+                print('{}, '.format(route[i]._index), end='')
+            print('')
