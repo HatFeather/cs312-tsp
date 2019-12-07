@@ -49,8 +49,8 @@ class KOptSolver(SolverBase):
 
         for i in range(1, indices_len):
 
-            index_a = indices[i - 1]
-            index_b = indices[i]
+            index_a = min(indices[i - 1], indices[i])
+            index_b = max(indices[i - 1], indices[i]) + 1
 
             part_a = route[0:index_a]
             part_b = route[index_a:index_b][::-1]
