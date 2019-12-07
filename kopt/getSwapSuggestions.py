@@ -1,6 +1,9 @@
 import heapq
 
 
+# given an index into an array representing a path,
+# returns the city specified by the index and the two
+# adjacent cities.
 def getAdjacent(index, array):
     first = index - 1
     if first < 0:
@@ -11,6 +14,8 @@ def getAdjacent(index, array):
     return [array[first], array[index], array[last]]
 
 
+# represents a suggestion of cities to put next to each other
+# in a swap
 class SwapSuggestion:
     def __init__(self, cities, costs):
         self.cities = cities
@@ -23,9 +28,12 @@ class SwapSuggestion:
         return self.getPriority() < other.getPriority()
 
 
+# this constant decides which cities are counted as 'close'. The higher the number,
+# the more suggested paths the algorithm will return
 CLOSE_CITY = 0.8
 
 
+# class that finds cities to swap given a path
 class SwapFinder:
 
     def __init__(self):
@@ -33,16 +41,20 @@ class SwapFinder:
         self._suggestions = []
         self._shorter = []
 
+    # call to reset the path to a new one
     def setCities(self, cities):
         self._cities = cities
         self._processSwapSuggestions()
 
+    # return the suggestion with the lowest cost and remove it
     def getSuggestion(self):
         if len(self._suggestions) is 0:
             return None
         suggestion = heapq.heappop(self._suggestions)
         return suggestion.cities
 
+    # gets the cities close to the given city that are not being used in the current path.
+    # runs in O(n) where n is the number of cities because it iterates through each city.
     def _getCloseUnused(self, index):
         results = []
         city = self._cities[index]
@@ -58,14 +70,17 @@ class SwapFinder:
                 results.append(i)
         return results
 
+    # given two indicies in the cities, updates the suggestions to include
+    # the path between those two cities as well as several paths that start with those cities
     def _addSuggestion(self, index1, index2):
+        # add the initial 2 cities
         city1, city2 = self._cities[index1], self._cities[index2]
         initPath = [index1, index2]
         initCost = city1.costTo(city2)
         heapq.heappush(self._suggestions, SwapSuggestion(initPath, [initCost]))
 
+        # look for paths of length longer than 2
         bestCost = 0
-        bestPath = initPath
         lastPath = initPath
         lastCosts = [initCost]
         while bestCost < float('inf'):
@@ -78,11 +93,15 @@ class SwapFinder:
                     newCost = self._cities[last].costTo(self._cities[newCity])
                     newCosts = lastCosts + [newCost]
                     heapq.heappush(self._suggestions, SwapSuggestion(newPath, newCosts))
+
                     if newCost < bestCost:
+                        # next iteration, we only use the best path found for time's sake
                         bestCost = newCost
                         bestPath = newPath
+
             lastPath = bestPath
 
+    # given a new set of cities, update all of the suggestions
     def _processSwapSuggestions(self):
         self._suggestions = []
         for i in range(len(self._cities)):
