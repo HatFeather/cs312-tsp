@@ -12,12 +12,26 @@ class KOptSolver(SolverBase):
         route = self.build_initial_route()
         city_indices = [1, 2]
 
-        self.swap_cities(route, city_indices)
+        # route = self.swap_cities(route, city_indices)
+        self.print_route(route)
         self.set_bssf_from_route(route)
 
     def swap_cities(self, route, indices):
 
-        pass
+        indices_len = len(indices)
+
+        for i in range(1, indices_len):
+
+            index_a = indices[i - 1]
+            index_b = indices[i]
+
+            part_a = route[0:index_a]
+            part_b = route[index_a:index_b].reverse()
+            part_c = route[index_b:0]
+
+            route = part_a + part_b + part_c
+
+        return route
 
     def get_route_cost(self, route):
         cost = 0
@@ -43,3 +57,9 @@ class KOptSolver(SolverBase):
             route = default_results['soln'].route
 
         return route
+
+    def print_route(self, route):
+        print('path: ', end='')
+        for i in range(len(route)):
+            print('{}, '.format(route[i]._index), end='')
+        print('')
