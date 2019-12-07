@@ -102,6 +102,7 @@ class SwapFinder:
             lastPath = bestPath
 
     # given a new set of cities, update all of the suggestions
+    # runs in O(n^2) because of the nested for loop
     def _processSwapSuggestions(self):
         self._suggestions = []
         for i in range(len(self._cities)):
