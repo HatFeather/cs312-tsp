@@ -10,9 +10,9 @@ class KOptSolver(SolverBase):
     def run_algorithm(self):
 
         route = self.build_initial_route()
-        city_indices = [3, 6]
 
-        route = self.swap_cities(route, city_indices)
+        
+
         self.set_bssf_from_route(route)
 
     def swap_cities(self, route, indices):
@@ -60,7 +60,7 @@ class KOptSolver(SolverBase):
         return route
 
     def print_route(self, route, label='path'):
-        print('{}: '.format(label), end='')
+        print('{}:\t'.format(label), end='')
         if route == None:
             print('None')
         else:
