@@ -10,8 +10,6 @@ class KOptSolver(SolverBase):
 
     def run_algorithm(self):
 
-        self.test_swapping() # NOTE ignore me
-
         route = self.build_initial_route()
         self.set_bssf_from_route(route)
         swapFinder = SwapFinder()
@@ -25,22 +23,6 @@ class KOptSolver(SolverBase):
             #   swapFinder.setCities(newPath)
             #   suggestion = swapFinder.getSuggestion()
         return
-
-    def test_swapping(self):
-
-        route = self.build_initial_route()
-
-        city_indices = [3, 6]
-        self.swap_cities(route, city_indices)
-        print('')
-
-        city_indices = [3, 3]
-        self.swap_cities(route, city_indices)
-        print('')
-
-        city_indices = [6, 3]
-        self.swap_cities(route, city_indices)
-        print('')
 
     def swap_cities(self, route, indices):
 
