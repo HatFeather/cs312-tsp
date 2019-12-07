@@ -1,3 +1,4 @@
+from kopt.getSwapSuggestions import SwapFinder
 from solver_base import SolverBase
 from greedy.solver import GreedySolver
 
@@ -8,12 +9,20 @@ class KOptSolver(SolverBase):
         super().__init__(tsp_solver, max_time)
 
     def run_algorithm(self):
+        swapFinder = SwapFinder()
+        greedy = self.get_tsp_solver().greedy()
+        path = greedy['soln'].route
+        print(path)
+        swapFinder.setCities(path)
 
-        route = self.build_initial_route()
-        city_indices = [3, 6]
-
-        route = self.swap_cities(route, city_indices)
-        self.set_bssf_from_route(route)
+        suggestion = swapFinder.getSuggestion()
+        while suggestion is not None:
+            suggestion = swapFinder.getSuggestion()
+            # newPath = swap_cities(route, suggestion)
+            # if cost of path is less than old best
+            #   swapFinder.setCities(newPath)
+            #   suggestion = swapFinder.getSuggestion()
+        return
 
     def swap_cities(self, route, indices):
 
@@ -42,7 +51,7 @@ class KOptSolver(SolverBase):
             prev = route[i - 1]
             curr = route[i]
             cost += prev.costTo(curr)
-        
+
         cost += route[route_len - 1].costTo(route[0])
         return cost
 
