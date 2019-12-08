@@ -17,12 +17,17 @@ class KOptSolver(SolverBase):
 
         suggestion = swapFinder.getSuggestion()
         while suggestion is not None:
+
+            next_route = self.swap_cities(route, suggestion)
+            next_cost = self.get_route_cost(next_route)
+
+            if next_cost < self.get_best_cost():
+                route = next_route
+                swapFinder.setCities(route)
+                self.increment_solution_count()
+                self.set_bssf_from_route(route)
+
             suggestion = swapFinder.getSuggestion()
-            # newPath = swap_cities(route, suggestion)
-            # if cost of path is less than old best
-            #   swapFinder.setCities(newPath)
-            #   suggestion = swapFinder.getSuggestion()
-        return
 
     def swap_cities(self, route, indices):
         '''
@@ -36,7 +41,6 @@ class KOptSolver(SolverBase):
         '''
 
         indices_len = len(indices)
-        self.print_route(route, label='before swap')
 
         # O(k) loop through pairs of swap indices
         for i in range(1, indices_len):
@@ -52,7 +56,6 @@ class KOptSolver(SolverBase):
             # concatenate the path together (not guaranteed to be a valid path)
             route = part_a + part_b + part_c 
 
-        self.print_route(route, label='after swap')
         return route
 
     def get_route_cost(self, route):
