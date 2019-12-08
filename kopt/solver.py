@@ -9,18 +9,28 @@ class KOptSolver(SolverBase):
         super().__init__(tsp_solver, max_time)
 
     def run_algorithm(self):
+        '''
+        Local search which updates suggestions for the current route.
+        Each time 'swapFinder.setCities(route)' is called, a new bucket 
+        of possible search spaces is produced. When a better solution is
+        found, the search space is updated.\n
+        '''
 
+        # O(n^3) time and O(n) space to compute initial BSSF
         route = self.build_initial_route()
         self.set_bssf_from_route(route)
         swapFinder = SwapFinder()
         swapFinder.setCities(route)
 
+        # check all the suggestions procuded by the swapFinder
         suggestion = swapFinder.getSuggestion()
         while suggestion is not None:
 
+            # the suggestion has k suggested swaps --> O(k * n) time to swap cities
             next_route = self.swap_cities(route, suggestion)
             next_cost = self.get_route_cost(next_route)
 
+            # update the bssf if we've found a less expensive route by swapping
             if next_cost < self.get_best_cost():
                 route = next_route
                 swapFinder.setCities(route)
@@ -62,7 +72,6 @@ class KOptSolver(SolverBase):
         '''
         O(n) time and O(1) space to loop through a route
         and get its total cost
-        TODO: @Avery does your suggestion class already compute costs?
         '''
 
         cost = 0
