@@ -7,6 +7,7 @@ class KOptSolver(SolverBase):
 
     def __init__(self, tsp_solver, max_time):
         super().__init__(tsp_solver, max_time)
+    
 
     def run_algorithm(self):
         '''
@@ -24,7 +25,7 @@ class KOptSolver(SolverBase):
 
         # check all the suggestions procuded by the swapFinder
         suggestion = swapFinder.getSuggestion()
-        while suggestion is not None:
+        while suggestion is not None and not self.exceeded_max_time():
 
             # the suggestion has k suggested swaps --> O(k * n) time to swap cities
             next_route = self.swap_cities(route, suggestion)
@@ -36,8 +37,13 @@ class KOptSolver(SolverBase):
                 swapFinder.setCities(route)
                 self.increment_solution_count()
                 self.set_bssf_from_route(route)
+                print('sol (t: {0:.3f})'.format(self.get_clamped_time()))
 
             suggestion = swapFinder.getSuggestion()
+            
+        print('fin (t: {0:.3f})'.format(self.get_clamped_time()))
+        return
+    
 
     def swap_cities(self, route, indices):
         '''
@@ -67,6 +73,7 @@ class KOptSolver(SolverBase):
             route = part_a + part_b + part_c 
 
         return route
+    
 
     def get_route_cost(self, route):
         '''
@@ -85,6 +92,7 @@ class KOptSolver(SolverBase):
 
         cost += route[route_len - 1].costTo(route[0])
         return cost
+    
 
     def build_initial_route(self):
         '''
@@ -101,8 +109,8 @@ class KOptSolver(SolverBase):
         if route == None:
             default_results = self.get_tsp_solver().defaultRandomTour()
             route = default_results['soln'].route
-
         return route
+    
 
     def print_route(self, route, label='path'):
         print('{}:\t'.format(label), end='')
@@ -112,3 +120,4 @@ class KOptSolver(SolverBase):
             for i in range(len(route)):
                 print('{}, '.format(route[i]._index), end='')
             print('')
+        return
