@@ -3,6 +3,23 @@ from copy import copy
 from random import randrange
 import math
 
+def get_route_cost(route):
+    '''
+    O(n) time and O(1) space to loop through a route
+    and get its total cost
+    '''
+
+    cost = 0
+    route_len = len(route)
+
+    # sum up the cost of the route
+    for i in range(1, route_len):
+        prev = route[i - 1]
+        curr = route[i]
+        cost += prev.costTo(curr)
+
+    cost += route[route_len - 1].costTo(route[0])
+    return cost
 
 # NOTE: for all code below, let |V| be the number of cities
 class GreedySolver(SolverBase):
@@ -21,6 +38,11 @@ class GreedySolver(SolverBase):
         \ntime:     O(|V|) loop, with O(|V|^2) at each loop --> O(|V|^3)
         \nspace:    for the visted set and route array --> O(|V|)
         '''
+
+        default_results = self.get_tsp_solver().defaultRandomTour()
+        route = default_results['soln'].route
+        self.set_bssf_from_route(route)
+        best_cost = self.get_best_cost()
 
         # pick a random city to start at
         start_index = randrange(self.get_city_count())
@@ -43,9 +65,11 @@ class GreedySolver(SolverBase):
                 continue
 
             # a greedy solution was found, update bssf
-            self.set_bssf_from_route(sol)
-            self.increment_solution_count()
-            return
+            sol_cost = get_route_cost(sol)
+            if sol_cost < best_cost:
+                self.set_bssf_from_route(sol)
+                self.increment_solution_count()
+                best_cost = sol_cost
 
     def _greedy_solve(self, original, current, visited, route):
         '''

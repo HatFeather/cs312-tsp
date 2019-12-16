@@ -1,6 +1,7 @@
 from kopt.getSwapSuggestions import SwapFinder
 from solver_base import SolverBase
 from greedy.solver import GreedySolver
+from greedy.solver import get_route_cost
 
 
 class KOptSolver(SolverBase):
@@ -29,7 +30,7 @@ class KOptSolver(SolverBase):
 
             # the suggestion has k suggested swaps --> O(k * n) time to swap cities
             next_route = self.swap_cities(route, suggestion)
-            next_cost = self.get_route_cost(next_route)
+            next_cost = get_route_cost(next_route)
 
             # update the bssf if we've found a less expensive route by swapping
             if next_cost < self.get_best_cost():
@@ -73,25 +74,6 @@ class KOptSolver(SolverBase):
             route = part_a + part_b + part_c 
 
         return route
-    
-
-    def get_route_cost(self, route):
-        '''
-        O(n) time and O(1) space to loop through a route
-        and get its total cost
-        '''
-
-        cost = 0
-        route_len = len(route)
-
-        # sum up the cost of the route
-        for i in range(1, route_len):
-            prev = route[i - 1]
-            curr = route[i]
-            cost += prev.costTo(curr)
-
-        cost += route[route_len - 1].costTo(route[0])
-        return cost
     
 
     def build_initial_route(self):
